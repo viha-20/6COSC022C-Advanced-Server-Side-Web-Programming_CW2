@@ -38,23 +38,48 @@ const getBlogPosts = async (req, res, next) => {
   }
 };
 
+// const getBlogPostById = async (req, res, next) => {
+//   try {
+//     const post = await BlogPostDAO.findById(req.params.id);
+//     if (!post) {
+//       return res.status(404).json({ message: 'Yes Blog post not found' });
+//     }
+    
+//     const [likes, comments] = await Promise.all([
+//       LikeDAO.getCounts(post.id),
+//       CommentDAO.countByPostId(post.id)
+//     ]);
+    
+//     res.json({
+//       ...post,
+//       likes: likes.likes || 0,
+//       dislikes: likes.dislikes || 0,
+//       commentsCount: comments || 0
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
 const getBlogPostById = async (req, res, next) => {
   try {
     const post = await BlogPostDAO.findById(req.params.id);
     if (!post) {
-      return res.status(404).json({ message: 'Yes Blog post not found' });
+      return res.status(404).json({ message: 'Blog post not found' });
     }
     
-    const [likes, comments] = await Promise.all([
+    const [likes, comments, commentList] = await Promise.all([
       LikeDAO.getCounts(post.id),
-      CommentDAO.countByPostId(post.id)
+      CommentDAO.countByPostId(post.id),
+      CommentDAO.findByPostId(post.id) // Add this line
     ]);
     
     res.json({
       ...post,
       likes: likes.likes || 0,
       dislikes: likes.dislikes || 0,
-      commentsCount: comments || 0
+      commentsCount: comments || 0,
+      comments: commentList || [] // Add comments array
     });
   } catch (err) {
     next(err);
