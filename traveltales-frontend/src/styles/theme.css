@@ -1,0 +1,23 @@
+:root {
+  --primary-color: #6a0dad;
+  --primary-hover: #5a0ba5;
+  --secondary-color: #f5f5f5;
+  --text-color: #333;
+  --text-light: #777;
+  --white: #ffffff;
+  --error: #d32f2f;
+}
+
+body {
+  color: var(--text-color);
+  background-color: var(--secondary-color);
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
