@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { 
   Container, 
   Box, 
@@ -14,9 +14,10 @@ import {
 } from '@mui/material';
 import { useBlog } from '../../context/BlogContext';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../api'; // Make sure this is imported
+import api from '../../api';
 
-const CreateBlogPage = () => {
+const EditBlogPage = () => {
+  const { id } = useParams();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [countryName, setCountryName] = useState('');
@@ -25,62 +26,82 @@ const CreateBlogPage = () => {
   const [loading, setLoading] = useState(false);
   const [countriesLoading, setCountriesLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { createBlogPost } = useBlog();
-  const { apiKey } = useAuth();
+  const { updateBlogPost, fetchBlogById, currentBlog } = useBlog();
+  const { user, apiKey } = useAuth();
   const navigate = useNavigate();
 
-useEffect(() => {
-  const fetchCountries = async () => {
-    try {
-      setCountriesLoading(true);
-      setError(null);
-      
-      if (!apiKey) {
-        throw new Error('Authentication required');
+  useEffect(() => {
+    const loadBlogData = async () => {
+      try {
+        setLoading(true);
+        await fetchBlogById(id);
+      } catch (err) {
+        console.error('Failed to load blog:', err);
+        setError('Failed to load blog post');
+      } finally {
+        setLoading(false);
       }
+    };
 
-      console.log('Making request with API key:', apiKey); // Debug log
+    loadBlogData();
+  }, [id]);
 
-      const response = await api.get('/countries', {
-        headers: {
-          'x-api-key': apiKey,
-          'Content-Type': 'application/json'
+  useEffect(() => {
+    if (currentBlog) {
+      setTitle(currentBlog.title);
+      setContent(currentBlog.content);
+      setCountryName(currentBlog.country_name);
+      setDateOfVisit(currentBlog.date_of_visit?.split('T')[0] || '');
+    }
+  }, [currentBlog]);
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        setCountriesLoading(true);
+        setError(null);
+        
+        if (!apiKey) {
+          throw new Error('Authentication required');
         }
-      });
 
-      console.log('Countries response:', response.data); // Debug log
+        const response = await api.get('/countries', {
+          headers: {
+            'x-api-key': apiKey,
+            'Content-Type': 'application/json'
+          }
+        });
 
-      // Handle different response formats
-      const countriesData = Array.isArray(response.data) 
-        ? response.data 
-        : (response.data?.data && Array.isArray(response.data.data)) 
-          ? response.data.data 
-          : [];
+        const countriesData = Array.isArray(response.data) 
+          ? response.data 
+          : (response.data?.data && Array.isArray(response.data.data)) 
+            ? response.data.data 
+            : [];
 
-      if (countriesData.length === 0) {
-        throw new Error('No countries found in response');
+        if (countriesData.length === 0) {
+          throw new Error('No countries found in response');
+        }
+
+        setCountries(countriesData);
+      } catch (error) {
+        console.error('Detailed fetch error:', {
+          message: error.message,
+          response: error.response?.data,
+          config: error.config
+        });
+        setError('Failed to load countries. Please try again later.');
+      } finally {
+        setCountriesLoading(false);
       }
+    };
 
-      setCountries(countriesData);
-    } catch (error) {
-      console.error('Detailed fetch error:', {
-        message: error.message,
-        response: error.response?.data,
-        config: error.config
-      });
-      setError('Failed to load countries. Please try again later.');
-    } finally {
+    if (apiKey) {
+      fetchCountries();
+    } else {
+      setError('Authentication required to load countries');
       setCountriesLoading(false);
     }
-  };
-
-  if (apiKey) {
-    fetchCountries();
-  } else {
-    setError('Authentication required to load countries');
-    setCountriesLoading(false);
-  }
-}, [apiKey]);
+  }, [apiKey]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -92,26 +113,30 @@ useEffect(() => {
     
     setLoading(true);
     try {
-      await createBlogPost({
+      await updateBlogPost(id, {
         title,
         content,
         country_name: countryName,
         date_of_visit: dateOfVisit
-      });
-      navigate('/blogs');
+      }, apiKey);
+      navigate(`/blogs/${id}`);
     } catch (error) {
-      console.error('Error creating blog post:', error);
-      setError(error.message);
+      console.error('Error updating blog post:', error);
+      setError(error.response?.data?.message || error.message || 'Failed to update blog post');
     } finally {
       setLoading(false);
     }
   };
 
+  if (loading && !currentBlog) return <CircularProgress />;
+  if (!currentBlog) return <div>Blog post not found</div>;
+  if (user?.id !== currentBlog.user_id) return <div>You are not authorized to edit this post</div>;
+
   return (
     <Container maxWidth="md">
       <Box sx={{ my: 4 }}>
         <Typography variant="h4" sx={{ color: '#6a0dad', mb: 4 }}>
-          Create New Blog Post
+          Edit Blog Post
         </Typography>
         
         {error && (
@@ -178,7 +203,7 @@ useEffect(() => {
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
             <Button 
               variant="outlined" 
-              onClick={() => navigate('/blogs')}
+              onClick={() => navigate(`/blogs/${id}`)}
               sx={{ color: '#6a0dad', borderColor: '#6a0dad' }}
             >
               Cancel
@@ -194,7 +219,7 @@ useEffect(() => {
                 }
               }}
             >
-              {loading ? 'Publishing...' : 'Publish Post'}
+              {loading ? 'Updating...' : 'Update Post'}
             </Button>
           </Box>
         </Box>
@@ -203,4 +228,4 @@ useEffect(() => {
   );
 };
 
-export default CreateBlogPage;
+export default EditBlogPage;

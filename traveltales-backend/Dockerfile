@@ -1,28 +1,24 @@
-# Use official Node.js LTS image
 FROM node:18-alpine
 
-# Create app directory
 WORKDIR /usr/src/app
 
-# Install dependencies (including dev dependencies for building)
+# Install SQLite and netcat (for db check)
+RUN apk add --no-cache sqlite libc6-compat && \
+    mkdir -p /usr/src/app/db && \
+    chown node:node /usr/src/app/db
+
 COPY package*.json ./
 RUN npm install
 
-# Bundle app source
 COPY . .
 
-# Build the app (if needed)
-RUN npm run build
-
-# Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3001
 
-# Expose the application port
 EXPOSE 3001
 
-# Database initialization
-RUN npm run migrate
+# Health check and startup
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:3001/health || exit 1
 
-# Run the application
 CMD ["npm", "start"]

@@ -20,23 +20,7 @@ class CommentDAO {
     });
   }
 
-  // static async findByPostId(blog_post_id, { limit = 10, offset = 0 } = {}) {
-  //   return new Promise((resolve, reject) => {
-  //     db.all(
-  //       `SELECT c.*, u.username 
-  //        FROM comments c
-  //        JOIN users u ON c.user_id = u.id
-  //        WHERE c.blog_post_id = ?
-  //        ORDER BY c.created_at DESC
-  //        LIMIT ? OFFSET ?`,
-  //       [blog_post_id, limit, offset],
-  //       (err, rows) => {
-  //         if (err) return reject(err);
-  //         resolve(rows.map(row => new Comment(row)));
-  //       }
-  //     );
-  //   });
-  // }
+
 
   static async findByPostId(blog_post_id, { limit = 10, offset = 0 } = {}) {
     return new Promise((resolve, reject) => {

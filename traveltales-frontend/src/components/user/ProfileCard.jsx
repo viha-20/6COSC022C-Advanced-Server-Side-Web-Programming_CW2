@@ -36,14 +36,15 @@ const ProfileCard = ({ profile, isCurrentUser }) => {
       alignItems: 'center', 
       p: 3, 
       borderBottom: '1px solid #e0e0e0',
-      backgroundColor: '#f9f9f9',
+      backgroundColor: '#bea6de',
       borderRadius: 2,
-      mb: 3
+      mb: 3,
+      mt: 8,
     }}>
       <Avatar 
         src="/default-avatar.jpg" 
         alt={profile.username.toUpperCase()} 
-        sx={{ width: 100, height: 100, mb: 2 }}
+        sx={{ width: 100, height: 100, mb: 2,backgroundColor: '#262529' }}
       />
       <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
         {profile.username}

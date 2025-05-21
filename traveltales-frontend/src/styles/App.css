@@ -35,7 +35,7 @@ a {
 }
 
 .MuiAppBar-colorPrimary {
-  background-color: #6a0dad !important;
+  background-color: rgba(83, 44, 109, 0.878) !important;
 }
 
 .MuiBottomNavigation-root {
