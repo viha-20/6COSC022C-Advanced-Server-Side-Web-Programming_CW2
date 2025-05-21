@@ -2,7 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const db = require('./db/database');
+const db = require('./config/database');
 const path = require('path');
 
 
@@ -69,7 +69,12 @@ db.serialize(() => {
     }
   });
 });
-
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString()
+  });
+});
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

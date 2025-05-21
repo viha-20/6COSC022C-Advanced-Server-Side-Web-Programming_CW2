@@ -12,9 +12,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import ProfileFollowersPage from './pages/profile/ProfileFollowersPage';
 import ProfileFollowingPage from './pages/profile/ProfileFollowingPage';
-import CountryPage from './pages/country/CountryPage';
 import NotFoundPage from './pages/404';
-import ProtectedRoute from './components/common/ProtectedRoute';
 import './styles/App.css';
 import EditBlogPage from './components/blog/EditBlogPage';
 
@@ -35,12 +33,7 @@ function App() {
                 <Route path="/profile/:id" element={<ProfilePage />} />
                 <Route path="/profile/:id/followers" element={<ProfileFollowersPage />} />
                 <Route path="/profile/:id/following" element={<ProfileFollowingPage />} />
-                <Route path="/countries" element={<CountryPage />} />
                 <Route path="/edit-blog/:id" element={<EditBlogPage />} />
-                {/* Protected routes
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/create-blog" element={<BlogCreatePage />} />
-                </Route> */}
                 <Route path="/create-blog" element={<BlogCreatePage />} />
                 
                 <Route path="*" element={<NotFoundPage />} />

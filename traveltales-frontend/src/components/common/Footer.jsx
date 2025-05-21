@@ -1,28 +1,3 @@
-// import { Box, Typography } from '@mui/material';
-
-// const Footer = () => {
-//   return (
-//     <Box 
-//       component="footer" 
-//       sx={{ 
-//         py: 3, 
-//         px: 2, 
-//         mt: 'auto', 
-//         backgroundColor: '#6a0dad',
-//         color: 'white',
-//         textAlign: 'center'
-//       }}
-//     >
-//       <Typography variant="body2">
-//         © {new Date().getFullYear()} TravelTales - Share your travel stories
-//       </Typography>
-//     </Box>
-//   );
-// };
-
-// export default Footer;
-
-
 import { Box, Typography } from '@mui/material';
 
 const Footer = () => {
@@ -32,7 +7,7 @@ const Footer = () => {
       sx={{ 
         py: 2, 
         px: 2, 
-        backgroundColor: 'rgba(83, 79, 85, 0.9)',
+        backgroundColor: 'rgba(83, 44, 109, 0.878)',
         color: 'white',
         textAlign: 'center',
         position: 'fixed',

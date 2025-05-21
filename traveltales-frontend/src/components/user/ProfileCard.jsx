@@ -39,7 +39,7 @@ const ProfileCard = ({ profile, isCurrentUser }) => {
       backgroundColor: '#bea6de',
       borderRadius: 2,
       mb: 3,
-      mt: 5,
+      mt: 8,
     }}>
       <Avatar 
         src="/default-avatar.jpg" 

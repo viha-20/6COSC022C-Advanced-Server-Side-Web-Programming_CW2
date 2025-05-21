@@ -1,6 +1,6 @@
 const BlogPostDAO = require('../dao/BlogPostDAO');
 const LikeDAO = require('../dao/LikeDAO');
-const CommentDAO = require('../dao/commentDAO');
+const CommentDAO = require('../dao/CommentDAO');
 const { paginate } = require('../utils/helpers');
 const { validateBlogPostInput } = require('../utils/validators');
 
