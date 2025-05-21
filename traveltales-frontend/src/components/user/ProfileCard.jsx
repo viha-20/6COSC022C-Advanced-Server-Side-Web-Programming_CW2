@@ -2,14 +2,16 @@ import { Avatar, Box, Typography, Button } from '@mui/material';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { followUser, unfollowUser } from '../../api/user';
-import { useState } from 'react';
+import { use, useState,useEffect } from 'react';
 
 const ProfileCard = ({ profile, isCurrentUser }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isFollowing, setIsFollowing] = useState(profile.is_following);
   const [followersCount, setFollowersCount] = useState(profile.followers_count || 0);
-
+  useEffect(() => {
+    console.log("profile : ",profile);
+  },[])
   const handleFollow = async () => {
     try {
       if (isFollowing) {
@@ -21,6 +23,7 @@ const ProfileCard = ({ profile, isCurrentUser }) => {
         setIsFollowing(true);
         setFollowersCount(prev => prev + 1);
       }
+      console.log(profile.id);
     } catch (err) {
       console.error('Follow/unfollow error:', err);
     }
@@ -39,19 +42,19 @@ const ProfileCard = ({ profile, isCurrentUser }) => {
     }}>
       <Avatar 
         src="/default-avatar.jpg" 
-        alt={profile.username} 
+        alt={profile.username.toUpperCase()} 
         sx={{ width: 100, height: 100, mb: 2 }}
       />
       <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
         {profile.username}
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Joined {new Date(profile.created_at).toLocaleDateString()}
+        Joined {new Date(profile.createdAt).toLocaleDateString()}
       </Typography>
       
       <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
         <Box sx={{ textAlign: 'center' }}>
-          <Typography variant="h6">{profile.posts_count || 0}</Typography>
+          <Typography variant="h6">{profile.postsCount || 0}</Typography>
           <Typography variant="body2">Posts</Typography>
         </Box>
         <Box 
@@ -64,7 +67,7 @@ const ProfileCard = ({ profile, isCurrentUser }) => {
           }}
           onClick={() => navigate(`/profile/${profile.id}/followers`)}
         >
-          <Typography variant="h6">{followersCount}</Typography>
+          <Typography variant="h6">{profile.followersCount}</Typography>
           <Typography variant="body2">Followers</Typography>
         </Box>
         <Box 
@@ -77,7 +80,7 @@ const ProfileCard = ({ profile, isCurrentUser }) => {
           }}
           onClick={() => navigate(`/profile/${profile.id}/following`)}
         >
-          <Typography variant="h6">{profile.following_count || 0}</Typography>
+          <Typography variant="h6">{profile.followingCount || 0}</Typography>
           <Typography variant="body2">Following</Typography>
         </Box>
       </Box>

@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
       try {
         // Check if user is logged in by trying to generate an API key
         const response = await generateApiKey();
+        console.log('API Key:', response.data.apiKey);
         setUser(response.data.user);
         setApiKey(response.data.apiKey);
       } catch (err) {

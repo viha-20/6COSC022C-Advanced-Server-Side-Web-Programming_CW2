@@ -36,10 +36,11 @@ function App() {
                 <Route path="/profile/:id/following" element={<ProfileFollowingPage />} />
                 <Route path="/countries" element={<CountryPage />} />
                 
-                Protected routes
+                {/* Protected routes
                 <Route element={<ProtectedRoute />}>
                   <Route path="/create-blog" element={<BlogCreatePage />} />
-                </Route>
+                </Route> */}
+                <Route path="/create-blog" element={<BlogCreatePage />} />
                 
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

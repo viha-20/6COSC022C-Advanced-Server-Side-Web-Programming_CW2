@@ -653,41 +653,42 @@ const isDisliked = userLike?.is_like === false;
     setSnackbar(prev => ({ ...prev, open: false }));
   };
 
-  const handleLike = async () => {
-    if (!user) return;
-    try {
-      if (isLiked) {
-        await unlikeBlogPost(blog.id);
-      } else {
-        await likeBlogPost(blog.id, true); // true means like
-      }
-    } catch (error) {
-      console.error("Error handling like:", error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to update reaction',
-        severity: 'error'
-      });
+const handleLike = async () => {
+  if (!user) return;
+  try {
+    if (isLiked) {
+      await unlikeBlogPost(blog.id);
+    } else {
+      await likeBlogPost(blog.id, true); // true means like
     }
-  };
+  } catch (error) {
+    console.error("Error handling like:", error);
+    setSnackbar({
+      open: true,
+      message: 'Failed to update reaction',
+      severity: 'error'
+    });
+  }
+};
 
-  const handleDislike = async () => {
-    if (!user) return;
-    try {
-      if (isDisliked) {
-        await unlikeBlogPost(blog.id);
-      } else {
-        await likeBlogPost(blog.id, false); // false means dislike
-      }
-    } catch (error) {
-      console.error("Error handling dislike:", error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to update reaction',
-        severity: 'error'
-      });
-    }
-  };
+const handleDislike = async () => {
+  if (!user) return;
+  try {
+    // if (isDisliked) {
+    //   await unlikeBlogPost(blog.id);
+    // } else {
+    //   await likeBlogPost(blog.id, false); // false means dislike
+    // }
+    await likeBlogPost(blog.id, false); // false means dislike
+  } catch (error) {
+    console.error("Error handling dislike:", error);
+    setSnackbar({
+      open: true,
+      message: 'Failed to update reaction',
+      severity: 'error'
+    });
+  }
+};
 
   // Get flag image URL
   const flagImageUrl = blog.country_flag || 
@@ -836,7 +837,7 @@ const isDisliked = userLike?.is_like === false;
                 {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
               </IconButton>
               <Typography variant="body2">
-                {blog.likes_count || 0}
+                {blog.likes || 0}
               </Typography>
             </Box>
 
@@ -851,7 +852,7 @@ const isDisliked = userLike?.is_like === false;
                 {isDisliked ? <ThumbDownIcon /> : <ThumbDownOffAltIcon />}
               </IconButton>
               <Typography variant="body2">
-                {blog.dislikes_count || 0}
+                {blog.dislikes || 0}
               </Typography>
             </Box>
 
