@@ -2,28 +2,54 @@ const db = require('../db/database');
 const BlogPost = require('../models/BlogPost');
 
 class BlogPostDAO {
-  static async create({ title, content, country_name, date_of_visit, user_id }) {
-    return new Promise((resolve, reject) => {
-      db.run(
-        `INSERT INTO blog_posts 
-         (title, content, country_name, date_of_visit, user_id) 
-         VALUES (?, ?, ?, ?, ?)`,
-        [title, content, country_name, date_of_visit, user_id],
-        function(err) {
-          if (err) return reject(err);
-          resolve(new BlogPost({
-            id: this.lastID,
-            title,
-            content,
-            country_name,
-            date_of_visit,
-            user_id
-          }));
-        }
-      );
-    });
-  }
+  // static async create({ title, content, country_name, date_of_visit, user_id }) {
+  //   return new Promise((resolve, reject) => {
+  //     db.run(
+  //       `INSERT INTO blog_posts 
+  //        (title, content, country_name, date_of_visit, user_id) 
+  //        VALUES (?, ?, ?, ?, ?)`,
+  //       [title, content, country_name, date_of_visit, user_id],
+  //       function(err) {
+  //         if (err) return reject(err);
+  //         resolve(new BlogPost({
+  //           id: this.lastID,
+  //           title,
+  //           content,
+  //           country_name,
+  //           date_of_visit,
+  //           user_id
+  //         }));
+  //       }
+  //     );
+  //   });
+  // }
 
+  static async create({ title, content, country_name, date_of_visit, user_id }) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `INSERT INTO blog_posts 
+       (title, content, country_name, date_of_visit, user_id) 
+       VALUES (?, ?, ?, ?, ?)`,
+      [title, content, country_name, date_of_visit, user_id],
+      function(err) {
+        if (err) return reject(err);
+        
+        // Get the newly created post with username
+        db.get(
+          `SELECT bp.*, u.username 
+           FROM blog_posts bp
+           JOIN users u ON bp.user_id = u.id
+           WHERE bp.id = ?`,
+          [this.lastID],
+          (err, row) => {
+            if (err) return reject(err);
+            resolve(row ? new BlogPost(row) : null);
+          }
+        );
+      }
+    );
+  });
+}
 
   static async findById(id) {
     return new Promise((resolve, reject) => {
@@ -95,20 +121,57 @@ class BlogPostDAO {
     });
   }
 
-  static async findAll({ sort = 'newest', limit = 10, offset = 0 } = {}) {
+  // static async findAll({ sort = 'newest', limit = 10, offset = 0 } = {}) {
+  //   let orderBy;
+  //   switch (sort) {
+  //     case 'most_liked':
+  //       orderBy = `(
+  //         SELECT COUNT(*) FROM likes l 
+  //         WHERE l.blog_post_id = bp.id AND l.is_like = 1
+  //       ) DESC`;
+  //       break;
+  //     case 'most_commented':
+  //       orderBy = `(
+  //         SELECT COUNT(*) FROM comments c 
+  //         WHERE c.blog_post_id = bp.id
+  //       ) DESC`;
+  //       break;
+  //     default:
+  //       orderBy = 'bp.created_at DESC';
+  //   }
+
+  //   return new Promise((resolve, reject) => {
+  //     db.all(
+  //       `SELECT bp.*, u.username,
+  //        (SELECT COUNT(*) FROM blog_posts) as total_count,
+  //        (SELECT COUNT(*) FROM likes l WHERE l.blog_post_id = bp.id AND l.is_like = 1) as likes,
+  //        (SELECT COUNT(*) FROM likes l WHERE l.blog_post_id = bp.id AND l.is_like = 0) as dislikes,
+  //        (SELECT COUNT(*) FROM comments c WHERE c.blog_post_id = bp.id) as comments_count
+  //        FROM blog_posts bp
+  //        JOIN users u ON bp.user_id = u.id
+  //        ORDER BY ${orderBy}
+  //        LIMIT ? OFFSET ?`,
+  //       [limit, offset],
+  //       (err, rows) => {
+  //         if (err) return reject(err);
+  //         resolve({
+  //           posts: rows.map(row => new BlogPost(row)),
+  //           total: rows[0]?.total_count || 0
+  //         });
+  //       }
+  //     );
+  //   });
+  // }
+
+
+static async findAll({ sort = 'newest', limit = 10, offset = 0 } = {}) {
     let orderBy;
     switch (sort) {
       case 'most_liked':
-        orderBy = `(
-          SELECT COUNT(*) FROM likes l 
-          WHERE l.blog_post_id = bp.id AND l.is_like = 1
-        ) DESC`;
+        orderBy = `likes DESC`;
         break;
       case 'most_commented':
-        orderBy = `(
-          SELECT COUNT(*) FROM comments c 
-          WHERE c.blog_post_id = bp.id
-        ) DESC`;
+        orderBy = `comments_count DESC`;
         break;
       default:
         orderBy = 'bp.created_at DESC';
@@ -128,6 +191,12 @@ class BlogPostDAO {
         [limit, offset],
         (err, rows) => {
           if (err) return reject(err);
+          // Debug output to check the raw data
+          console.log('Raw query results:', rows.map(r => ({
+            id: r.id,
+            comments_count: r.comments_count
+          })));
+          
           resolve({
             posts: rows.map(row => new BlogPost(row)),
             total: rows[0]?.total_count || 0
@@ -136,6 +205,7 @@ class BlogPostDAO {
       );
     });
   }
+
 
   static async update(id, { title, content, country_name, date_of_visit }) {
     return new Promise((resolve, reject) => {
@@ -164,28 +234,6 @@ class BlogPostDAO {
       );
     });
   }
-
-// // In BlogPostDAO.js
-// static async getFeedForUser(userId, { limit = 10, offset = 0 } = {}) {
-//   console.log('DAO - Fetching feed for user:', userId);  // Add this
-//   return new Promise((resolve, reject) => {
-//     db.all(
-//       `SELECT bp.*, u.username 
-//        FROM blog_posts bp
-//        JOIN users u ON bp.user_id = u.id
-//        JOIN follows f ON f.following_id = bp.user_id
-//        WHERE f.follower_id = ?
-//        ORDER BY bp.created_at DESC
-//        LIMIT ? OFFSET ?`,
-//       [userId, limit, offset],
-//       (err, rows) => {
-//         console.log('DAO - Query results:', {err, rows});  // Add this
-//         if (err) return reject(err);
-//         resolve(rows.map(row => new BlogPost(row)));
-//       }
-//     );
-//   });
-// }
 
 
 static async getFeedForUser(userId, { limit = 10, offset = 0 } = {}) {

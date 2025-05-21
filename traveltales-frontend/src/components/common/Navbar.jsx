@@ -27,13 +27,15 @@
 //         zIndex: 1000
 //       }}
 //     >
-//       <BottomNavigationAction 
-//         label="Home" 
-//         icon={<HomeIcon />} 
-//         component={Link} 
-//         to="/" 
-//         sx={{ color: 'white' }}
-//       />
+//       {user && (
+//         <BottomNavigationAction 
+//           label="Following" 
+//           icon={<HomeIcon />} 
+//           component={Link} 
+//           to="/" 
+//           sx={{ color: 'white' }}
+//         />
+//       )}
 //       <BottomNavigationAction 
 //         label="Explore" 
 //         icon={<ExploreIcon />} 
@@ -64,8 +66,6 @@
 // export default Navbar;
 
 
-
-
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
@@ -89,10 +89,26 @@ const Navbar = () => {
       sx={{ 
         width: '100%', 
         position: 'fixed', 
-        bottom: 0, 
-        backgroundColor: '#6a0dad',
+        top: 0, 
+        backgroundColor: 'rgba(83, 79, 85, 0.9)',
         color: 'white',
-        zIndex: 1000
+        zIndex: 1000,
+        backdropFilter: 'blur(10px)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        '& .MuiBottomNavigationAction-root': {
+          minWidth: '60px',
+          padding: '6px 12px',
+          transition: 'all 0.3s ease',
+          '&.Mui-selected': {
+            color: '#fff',
+            transform: 'translateY(-2px)',
+          },
+          '&:hover': {
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            borderRadius: '8px'
+          }
+        }
       }}
     >
       {user && (

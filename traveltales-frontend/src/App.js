@@ -16,6 +16,7 @@ import CountryPage from './pages/country/CountryPage';
 import NotFoundPage from './pages/404';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import './styles/App.css';
+import EditBlogPage from './components/blog/EditBlogPage';
 
 function App() {
   return (
@@ -35,7 +36,7 @@ function App() {
                 <Route path="/profile/:id/followers" element={<ProfileFollowersPage />} />
                 <Route path="/profile/:id/following" element={<ProfileFollowingPage />} />
                 <Route path="/countries" element={<CountryPage />} />
-                
+                <Route path="/edit-blog/:id" element={<EditBlogPage />} />
                 {/* Protected routes
                 <Route element={<ProtectedRoute />}>
                   <Route path="/create-blog" element={<BlogCreatePage />} />

@@ -4,12 +4,25 @@ const CommentDAO = require('../dao/commentDAO');
 const { paginate } = require('../utils/helpers');
 const { validateBlogPostInput } = require('../utils/validators');
 
-// Public endpoints
+
 // const getBlogPosts = async (req, res, next) => {
 //   try {
 //     const { page = 1, limit = 10, sort = 'newest' } = req.query;
-//     const posts = await BlogPostDAO.findAll({ sort, limit, offset: (page - 1) * limit });
-//     res.json(paginate(posts, parseInt(page), parseInt(limit)));
+//     const posts = await BlogPostDAO.findAll({ 
+//       sort, 
+//       limit, 
+//       offset: (page - 1) * limit 
+//     });
+
+//     res.json({
+//       success: true,
+//       data: posts,
+//       pagination: {
+//         page: parseInt(page),
+//         limit: parseInt(limit),
+//         total: posts.length // Note: For accurate totals, you might need a COUNT query
+//       }
+//     });
 //   } catch (err) {
 //     next(err);
 //   }
@@ -18,7 +31,7 @@ const { validateBlogPostInput } = require('../utils/validators');
 const getBlogPosts = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, sort = 'newest' } = req.query;
-    const posts = await BlogPostDAO.findAll({ 
+    const result = await BlogPostDAO.findAll({ 
       sort, 
       limit, 
       offset: (page - 1) * limit 
@@ -26,11 +39,17 @@ const getBlogPosts = async (req, res, next) => {
 
     res.json({
       success: true,
-      data: posts,
+      data: result.posts.map(post => ({
+        ...post,
+        username: post.username,  // Ensure username is included
+        commentsCount: post.comments_count || 0, // Include comments count
+        likes: post.likes || 0,                 // These are already in your query
+        dislikes: post.dislikes || 0            // These are already in your query
+      })),
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: posts.length // Note: For accurate totals, you might need a COUNT query
+        total: result.total
       }
     });
   } catch (err) {
@@ -38,28 +57,6 @@ const getBlogPosts = async (req, res, next) => {
   }
 };
 
-// const getBlogPostById = async (req, res, next) => {
-//   try {
-//     const post = await BlogPostDAO.findById(req.params.id);
-//     if (!post) {
-//       return res.status(404).json({ message: 'Yes Blog post not found' });
-//     }
-    
-//     const [likes, comments] = await Promise.all([
-//       LikeDAO.getCounts(post.id),
-//       CommentDAO.countByPostId(post.id)
-//     ]);
-    
-//     res.json({
-//       ...post,
-//       likes: likes.likes || 0,
-//       dislikes: likes.dislikes || 0,
-//       commentsCount: comments || 0
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
 
 const getBlogPostById = async (req, res, next) => {
   try {
@@ -86,7 +83,23 @@ const getBlogPostById = async (req, res, next) => {
   }
 };
 
-// Authenticated endpoints
+// // Authenticated endpoints
+// const createBlogPost = async (req, res, next) => {
+//   try {
+//     const { title, content, country_name, date_of_visit } = req.body;
+//     const post = await BlogPostDAO.create({
+//       title,
+//       content,
+//       country_name,
+//       date_of_visit,
+//       user_id: req.user.id
+//     });
+//     res.status(201).json(post);
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
 const createBlogPost = async (req, res, next) => {
   try {
     const { title, content, country_name, date_of_visit } = req.body;
@@ -97,7 +110,17 @@ const createBlogPost = async (req, res, next) => {
       date_of_visit,
       user_id: req.user.id
     });
-    res.status(201).json(post);
+    
+    res.status(201).json({
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      country_name: post.country_name,
+      date_of_visit: post.date_of_visit,
+      user_id: post.user_id,
+      username: post.username,  // Include username in response
+      created_at: post.created_at
+    });
   } catch (err) {
     next(err);
   }
@@ -151,24 +174,6 @@ const deleteBlogPost = async (req, res, next) => {
     next(err);
   }
 };
-
-// const searchBlogPosts = async (req, res, next) => {
-//   try {
-//     const { country, username, page = 1, limit = 10 } = req.query;
-    
-//     if (country) {
-//       const posts = await BlogPostDAO.findByCountry(country, { limit, offset: (page - 1) * limit });
-//       res.json(paginate(posts, parseInt(page), parseInt(limit)));
-//     } else if (username) {
-//       const posts = await BlogPostDAO.findByUsername(username, { limit, offset: (page - 1) * limit });
-//       res.json(paginate(posts, parseInt(page), parseInt(limit)));
-//     } else {
-//       res.status(400).json({ message: 'Please provide country or username to search' });
-//     }
-//   } catch (err) {
-//     next(err);
-//   }
-// };
 
 
 const searchBlogPosts = async (req, res, next) => {
@@ -227,18 +232,6 @@ const searchBlogPosts = async (req, res, next) => {
     next(err);
   }
 };
-
-// const getUserFeed = async (req, res, next) => {
-//   try {
-//     const { page = 1, limit = 10 } = req.query;
-//     console.log(`User ${req.user.id} is fetching feed`);
-//     const posts = await BlogPostDAO.getFeedForUser(req.user.id, { limit, offset: (page - 1) * limit });
-//     console.log('Found posts:', posts);
-//     res.json(paginate(posts, parseInt(page), parseInt(limit)));
-//   } catch (err) {
-//     next(err);
-//   }
-// };
 
 const getUserFeed = async (req, res, next) => {
   try {

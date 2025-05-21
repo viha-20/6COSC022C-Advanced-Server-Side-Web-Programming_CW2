@@ -586,6 +586,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useAuth } from '../../context/AuthContext';
 import { useBlog } from '../../context/BlogContext';
 import { formatDate } from '../../utils/helpers';
+import EditIcon from '@mui/icons-material/Edit';
 
 const BlogCard = ({ blog, onDelete }) => {
   const { user, apiKey } = useAuth();
@@ -690,10 +691,6 @@ const handleDislike = async () => {
   }
 };
 
-  // Get flag image URL
-  const flagImageUrl = blog.country_flag || 
-                      (blog.country_code ? `https://flagcdn.com/w320/${blog.country_code.toLowerCase()}.png` : null);
-
   return (
     <>
       <Card sx={{ 
@@ -706,7 +703,7 @@ const handleDislike = async () => {
         {/* Flag background with overlay */}
         <Box sx={{
           height: 200,
-          backgroundImage: flagImageUrl ? `url(${flagImageUrl})` : 'linear-gradient(135deg, #6a0dad 0%, #8a2be2 100%)',
+          backgroundImage: 'linear-gradient(135deg,rgb(144, 71, 197) 0%,rgb(83, 136, 216) 100%)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative',
@@ -731,7 +728,8 @@ const handleDislike = async () => {
               color: 'white',
               fontWeight: 'bold',
               textShadow: '1px 1px 3px rgba(0,0,0,0.8)',
-              fontSize: '1.8rem'
+              fontSize: '1.5rem',
+              fontStyle: 'italic'
             }}
           >
             {blog.country_name || blog.country || 'Travel Destination'}
@@ -773,6 +771,13 @@ const handleDislike = async () => {
             },
           }}
         >
+          <MenuItem 
+            component={Link}
+            to={`/edit-blog/${blog.id}`}
+            onClick={handleMenuClose}
+          >
+            <EditIcon sx={{ mr: 1 }} /> Edit
+          </MenuItem>
           <MenuItem onClick={handleDeleteClick}>Delete Post</MenuItem>
         </Menu>
 
@@ -782,7 +787,7 @@ const handleDislike = async () => {
             <Avatar 
               src={blog.user?.avatar || '/default-avatar.jpg'} 
               alt={blog.username.toUpperCase()} 
-              sx={{ width: 32, height: 32, mr: 1 }}
+              sx={{ width: 32, height: 32, mr: 1,backgroundColor: '#262529' }}
               component={Link}
               to={`/profile/${blog.user_id}`}
             />
@@ -821,7 +826,7 @@ const handleDislike = async () => {
           
           {/* Blog content preview */}
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 2 }}>
-            {blog.content.substring(0, 100)}...
+            {blog.content.substring(0, 300)}...
           </Typography>
           
           {/* Reaction buttons */}

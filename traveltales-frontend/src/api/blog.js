@@ -13,7 +13,16 @@ export const getBlogPosts = (sort) => {
 
 export const getBlogPostById = (id) => api.get(`/blogs/${id}`);
 export const createBlogPost = (postData) => api.post('/blogs', postData);
-export const updateBlogPost = (id, postData) => api.put(`/blogs/${id}`, postData);
+// export const updateBlogPost = (id, postData) => api.put(`/blogs/${id}`, postData);
+
+export const updateBlogPost = (id, postData, apiKey) => 
+  api.put(`/blogs/${id}`, postData, {
+    headers: {
+      'x-api-key': apiKey,
+      'Content-Type': 'application/json'
+    }
+  });
+
 // export const deleteBlogPost = (id) => api.delete(`/blogs/${id}`);
 
 export const deleteBlogPost = (id, apiKey) => 
