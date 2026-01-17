@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const UserDAO = require('../dao/userDAO');
+const UserDAO = require('../dao/UserDAO');
 
 class AuthService {
   static async register({ username, email, password }) {

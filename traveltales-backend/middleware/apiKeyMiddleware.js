@@ -1,4 +1,4 @@
-const ApiKeyDAO = require('../dao/apiKeyDAO');
+const ApiKeyDAO = require('../dao/ApiKeyDAO');
 
 const validateApiKey = async (req, res, next) => {
   const apiKey = req.headers['x-api-key'] || req.query.apiKey;

@@ -1,6 +1,6 @@
 const AuthService = require('../services/authService');
 const TokenService = require('../services/tokenService');
-const ApiKeyDAO = require('../dao/apiKeyDAO');
+const ApiKeyDAO = require('../dao/ApiKeyDAO');
 const { validateRegisterInput, validateLoginInput } = require('../utils/validators');
 
 const register = async (req, res, next) => {
@@ -22,6 +22,10 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    // Add input validation
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
     
     const user = await AuthService.login(email, password);
     const token = TokenService.generateToken(user.id);

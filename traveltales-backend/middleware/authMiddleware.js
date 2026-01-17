@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-const ApiKeyDAO = require('../dao/apiKeyDAO');
+const ApiKeyDAO = require('../dao/ApiKeyDAO');
 
 dotenv.config();
 

@@ -1,4 +1,4 @@
-const UserDAO = require('../dao/userDAO');
+const UserDAO = require('../dao/UserDAO');
 const FollowDAO = require('../dao/FollowDAO');
 const BlogPostDAO = require('../dao/BlogPostDAO');
 
